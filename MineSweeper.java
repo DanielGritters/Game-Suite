@@ -17,10 +17,10 @@ public class MineSweeper {
 	 * main method.
 	 * @param args arguments
 	 */
-	public static void main(final String[] args) {
+	public MineSweeper() {
 		JFrame frame;
 		frame = new JFrame("MineSweeper");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		MineSweeperPanel panel = new MineSweeperPanel();
 		frame.getContentPane().add(panel);

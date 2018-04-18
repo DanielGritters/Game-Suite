@@ -1,11 +1,11 @@
-import java.awt.BorderLayout;
-import javax.swing.JFrame;
-
+package gameCode;
+import java.awt.*;
+import javax.swing.*;
 
 /**
  * Creates the window and adds a gamePanel to it.
  * 
- *@author Kevin Holkeboer
+ * @author Kevin Holkeboer
  *@version 1.0
  *@since 1.0
  */
@@ -16,12 +16,17 @@ public class SimonSaysGUI extends JFrame {
 	public SimonSaysGUI() {
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		
 		SimonSaysPanel gamePanel = new SimonSaysPanel();
+		//gamePanel.setPreferredSize(new Dimension(25,25));
 		add(gamePanel);
-			
-		setSize(800,800);
+		
+		//JLabel title = new JLabel("Simon Says");
+		//add(title, BorderLayout.NORTH);
+		//pack();
+	
+		setSize(400,400);
 		setTitle("Simon Says");
 		setResizable(true);
 		setVisible(true);

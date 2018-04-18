@@ -1,3 +1,4 @@
+package gameCode;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.LayoutManager;
@@ -83,7 +84,7 @@ public class GameLauncher implements ActionListener{
 		} else if (e.getSource() == battleShip) {
 			Battleship.main(args);
 		} else if (e.getSource() == mineSweeper) {
-			MineSweeper.main(args);
+			new MineSweeper();
 		}
 		
 	}
