@@ -15,8 +15,8 @@ public class SimonSaysGUI extends JFrame {
 	 */
 	public SimonSaysGUI() {
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLayout(new BorderLayout());
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		//setLayout(new BorderLayout());
 		
 		SimonSaysPanel gamePanel = new SimonSaysPanel();
 		add(gamePanel);

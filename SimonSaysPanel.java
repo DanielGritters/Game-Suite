@@ -4,6 +4,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -21,36 +22,53 @@ import javax.swing.Timer;
  * @since 1.0
  */
 public class SimonSaysPanel extends JPanel implements ActionListener {
+	
+	/**
+	 * The number of completed rounds or score.
+	 */
+	private int scoreValue = 0;
+	
+	/**
+	 * The label that displays the score.
+	 */
+	private JLabel score = new JLabel("Score: " + scoreValue);
+	
 	/**
 	 * The red button of the game board.
 	 */
 	private JButton redButton = new JButton("Red");
+	
 	/**
 	 * The blue button of the game board.
 	 */
 	private JButton blueButton = new JButton("Blue");
+	
 	/**
 	 * The green button of the game board.
 	 */
 	private JButton greenButton = new JButton("Green");
+	
 	/**
 	 * The yellow button of the game board.
 	 */
 	private JButton yellowButton = new JButton("Yellow");
+	
 	/**
 	 * The play button of the game board.
 	 */
 	private JButton playButton = new JButton("Play");
+	
 	/**
 	 * An array containing all the game buttons that are added to the
 	 * pattern.
 	 */
 	private JButton[] colorButtons = {redButton, blueButton,
 			greenButton, yellowButton};
+	
 	/**
 	 * The active game. starting with the red button.
 	 */
-	private GameController game = new GameController(redButton);
+	private GameController game = new GameController(colorButtons);
 	
 	/**
 	 * Constructor that creates the layout for the buttons.
@@ -99,6 +117,14 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 		playConst.gridy = 100;
 		playConst.weightx = 1;
 		/**
+		 * Constraint to place the score label above the play button.
+		 */
+		GridBagConstraints scoreConst = new GridBagConstraints();
+		scoreConst.gridx = 100;
+		scoreConst.gridy = 50;
+		scoreConst.weightx = 1;
+		scoreConst.weighty = .01;
+		/**
 		 * Adds ActionListener to all five buttons.
 		 */
 		redButton.addActionListener(this);
@@ -115,16 +141,18 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 		yellowButton.setBackground(Color.YELLOW);
 	
 		/**
-		 * Adds the buttons and their constraints to the board.
+		 * Adds the buttons and the score label and
+		 * their constraints to the board.
 		 */
 		add(redButton, red);
 		add(blueButton, blue);
 		add(yellowButton, green);
 		add(greenButton, yellow);
 		add(playButton, playConst);
-		
+		add(score, scoreConst);
 		
 	}
+	
 	/**
 	 * Responds to the buttons being clicked.
 	 * <p>
@@ -136,7 +164,7 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 	 * <p>
 	 * If the game button doesn't match the pattern, the GameController 
 	 * constructor is called to reset the game and a pop-up tells the player
-	 * they lost.
+	 * they lost and their score.
 	 * 
 	 * @param e
 	 * 		One of the buttons being clicked. 
@@ -151,19 +179,28 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 			
 			if (e.getSource() instanceof JButton) {
 				if (game.checkColor((JButton) e.getSource())) {
-					game.playerLoc++;
-					if (game.playerLoc 
-						>= game.pattern.size()) {
+					//game.setPlayerLoc(
+						//	game.getPlayLoc() + 1);
+					if (game.getPlayLoc() 
+						>= game.getPatternSize()) {
 						
 						game.newColor(colorButtons);
 						flashButtons();
-						game.playerLoc = 0;
+						setScore();
+						game.resetPlayerLoc();
 					}
 				} else {
+					/**
+					 * Displays a pop up massage 
+					 * when the game is lost
+					 */
 					JOptionPane.showInternalMessageDialog(
-						getParent(),"Game Reset");
+						getParent(),
+						"Game Reset \n Score: "
+						+ scoreValue);
 					
-					game = new GameController(redButton);
+					game = new GameController(colorButtons);
+					setScore();
 				}
 				
 			}
@@ -193,12 +230,22 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 		 * Loops through the current pattern changing and then
 		 * reseting the buttons' colors.
 		 */
-		while (gameLoc < game.pattern.size()) {
+		int delay = 0;
+		/**
+		 * Disables all the buttons while they are being flashed
+		 */
+		redButton.setEnabled(false);
+		blueButton.setEnabled(false);
+		yellowButton.setEnabled(false);
+		greenButton.setEnabled(false);
+		playButton.setEnabled(false);
+		
+		while (gameLoc < game.getPatternSize()) {
 			/**
 			 * Increases the delay by one second for each color
 			 * change and reset.
 			 */
-			int delay = (delayMulti * 1000);
+			delay = (delayMulti * 1000);
 			/**
 			 * Indicates which button's color will be changed.
 			 */
@@ -208,11 +255,11 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 			 * Indicates on true that the button's color has been
 			 *  reset to the original.
 			 */
-			final Boolean innerResetColors = Boolean.valueOf(resetColors);
+			final Boolean innerResetColors = 
+					Boolean.valueOf(resetColors);
 					
-			System.out.println(delay);
 			/**
-			 * Changes the color of the current button and calls
+			 * Changes the color of the current button or calls
 			 * resetColors to reset the original color.
 			 */
 			ActionListener setColor = new ActionListener() {
@@ -222,14 +269,16 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 					if (innerResetColors) {
 						resetColors();
 					} else {
-						game.pattern.get(currentButton).
+						game.getPatternButton(
+								currentButton).
 						setBackground(Color.CYAN);
-						System.out.println("set");
 					}
 					
 				}
 				
 			};
+			
+		
 			/**
 			 * Delays the color changes by the time of delay.
 			 */
@@ -254,10 +303,39 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 			} else {
 				resetColors = true;
 			}
-		}
+			
+		} //End While
 		
+		/**
+		 * Re-enables all the buttons is delayed
+		 * by the timer enableDelay
+		 */
+		ActionListener enableButtons = new ActionListener() {
+
+			@Override
+			public void actionPerformed(final ActionEvent arg0) {
+				redButton.setEnabled(true);
+				blueButton.setEnabled(true);
+				yellowButton.setEnabled(true);
+				greenButton.setEnabled(true);
+				playButton.setEnabled(true);
+				
+			}
+			
+		};
+		
+		/**
+		 * Delays the buttons getting enabled
+		 * until after their colors are reset
+		 */
+		Timer enableDelay = new Timer(delay, enableButtons);
+		enableDelay.setRepeats(false);
+		enableDelay.start();
 		
 	}
+	
+	
+	
 	/**
 	 * Resets the four game buttons to their original color.
 	 */
@@ -266,8 +344,14 @@ public class SimonSaysPanel extends JPanel implements ActionListener {
 		blueButton.setBackground(Color.BLUE);
 		greenButton.setBackground(Color.GREEN);
 		yellowButton.setBackground(Color.YELLOW);
-		System.out.println("reset");
 	}
-	
+	/**
+	 * Set the value of scoreValue which is displayed. 
+	 * by the JLabel score
+	 */
+	private void setScore() {
+		scoreValue = game.getPatternSize() - 1;
+		score.setText("Score: " + scoreValue);
+	}
 	
 }
