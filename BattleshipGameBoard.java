@@ -7,17 +7,19 @@
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 public class BattleshipGameBoard {
 	
-	private static int[][] board;
-	protected int numShots = 0;
-	protected int shipsRemaining;
+	static int[][] board;
+	protected static int numShots = 0;
+	protected static int shipsRemaining;
 	
 	/**
 	 * Constructor
-	 * Initializes the game board (currently only implements one size board), filling
-	 * all cells with -1 initially, then randomly places ships (currently only 3) on the grid.
-	 * The constructor finishes by printing the initial board containing only ships and water.
+	 * Initializes the game board, filling all cells with -1 initially,
+	 * then randomly places ships on the grid. The constructor finishes by printing 
+	 * the initial board containing only ships and water.
 	 */
 	public BattleshipGameBoard() {
 		
@@ -44,6 +46,27 @@ public class BattleshipGameBoard {
 	}
 	
 	/**
+	 * Test used to make sure initBoard() fills every cell in board with -1
+	 * 
+	 * @return boolean
+	 */
+	private boolean initTest() {
+		
+		board = new int[5][5];
+				
+		for (int row = 0; row < board.length; row++) {
+			for (int col = 0; col < board.length; col++) {
+				if(board[row][col] != -1) {
+					return false;
+				}
+			}
+		}
+		
+		return true;
+		
+	}
+	
+	/**
 	 * Uses Random() to obtain two random integers 0-4 which are used to place the ships within
 	 * the multi-dimensional array. Also keeps track of the number of ships that have been placed,
 	 * and whether the required amount of ships have been placed on the board.
@@ -56,9 +79,6 @@ public class BattleshipGameBoard {
 		
 		while(placed==false) {
 			
-			// Currently only places 3 ships which only take up 1 space
-			// -2 Currently represents a ship. Will be updated to reflect more
-			// than one game mode.
 			int x = r.nextInt(5);
 			int y = r.nextInt(5);
 				
@@ -72,6 +92,33 @@ public class BattleshipGameBoard {
 				placed = true;
 			}
 				
+		}
+	}
+	
+	/**
+	 * Tests whether or not ships are added after calling the constructor.
+	 * 
+	 * @return boolean
+	 */
+	private boolean shipsAdded() {
+		
+		BattleshipGameBoard test = new BattleshipGameBoard();
+		
+		int shipCount = 0;
+		
+		for(int i = 0; i < 5; i++) {
+			for(int j = 0; j < 5; j++) {
+				if(board[i][j] != -2) {
+					shipCount++;
+				}
+			}
+		}
+		
+		if(shipCount == 3) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	
@@ -117,9 +164,13 @@ public class BattleshipGameBoard {
 		Scanner input = new Scanner(System.in);
 		
 		System.out.print("Enter row coordinate: ");
-		int row = input.nextInt();
+			int row = input.nextInt();
 		System.out.print("Enter column coordinate: ");
-		int col = input.nextInt();
+			int col = input.nextInt();
+			
+		if(row < 1 || row > 5 || col < 1 || col > 5) {
+			System.out.print("Invalid coordinates! Coordinates must be between 1 and 5!");
+		}
 
 		if(board[row-1][col-1]==-2) {
 			board[row-1][col-1] = 1;
@@ -137,6 +188,35 @@ public class BattleshipGameBoard {
 				cont = input.nextInt();
 				System.out.println("\n");
 			}
+		}
+		else {
+			board[row-1][col-1] = 0;
+			numShots++;
+		}
+		
+	}
+	
+	/**
+	 * Allows the player to reveal whether or not each cell has a ship within it or not.
+	 * Takes integer input from the user and checks the value of the cell that is chosen. 
+	 * Also keeps track of the total number of shots taken in the game and the number of
+	 * ships that remain on teh board that have not been hit. 
+	 * 
+	 * This function takes in two int variables in order to work correctly with the GUI.
+	 */
+	public void shoot(int row, int col) {
+			
+		if(row < 1 || row > 5 || col < 1 || col > 5) {
+			JOptionPane.showMessageDialog(BattleshipGUI.gameBoardPanel, "Invalid coordinates! Coordinates must be between 1 and 5!");
+		}
+
+		if(board[row-1][col-1]==-2) {
+			board[row-1][col-1] = 1;
+			numShots++;
+			shipsRemaining--;
+		}
+		else if (board[row-1][col-1]==0 || board[row-1][col-1]==1) {
+				JOptionPane.showMessageDialog(BattleshipGUI.gameBoardPanel, "You've already shot at this area! Try new coordinates!");
 		}
 		else {
 			board[row-1][col-1] = 0;
